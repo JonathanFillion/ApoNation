@@ -25,6 +25,7 @@ public class CameraManager : MonoBehaviour
     void Start()
     {
         cameras = Camera.allCameras;
+        print(cameras.Length);
         PlayerView();
     }
 
@@ -32,10 +33,14 @@ public class CameraManager : MonoBehaviour
     {
         if (playerCam)
         {
+            print("Enable vehicule cam");
+
             VehiculeView();
         }
         else
         {
+            print("Enable player cam");
+
             PlayerView();
         }
     }

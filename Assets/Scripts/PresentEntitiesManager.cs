@@ -55,8 +55,9 @@ public class PresentEntitiesManager : MonoBehaviour
     {
         isPlayerControl = true;
         isVehiculeControl = false;
-        Player.transform.position = Vehicule.transform.position;
         Player.SetActive(true);
+        //Player.transform.position = Vehicule.transform.position;
+
     }
 
     public void VehiculeEntityEnabled()

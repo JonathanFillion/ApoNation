@@ -50,49 +50,72 @@ public class VehiculeController : MonoBehaviour
         visualWheel.transform.rotation = rotation;
     }
 
+    public void Update()
+    {
+        if (PresentEntitiesManager.instance.isVehiculeControl)
+        {
+            CheckForVehiculeExit();
+        }
+    }
+
     public void FixedUpdate()
     {
-        float speed = rb.velocity.magnitude;
-        var velocity = rb.velocity;
-        var localVel = transform.InverseTransformDirection(velocity);
-        float motor = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
-        float steering = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
 
-        float brake = 0;
-        if (localVel.z > 0)
+        if (PresentEntitiesManager.instance.isVehiculeControl)
         {
-            brake = maxBraqueTorque * -1 * Mathf.Clamp(Input.GetAxis("Vertical"), -1, 0);
-        }
-        else
-        {
-            brake = maxBraqueTorque * Mathf.Clamp(Input.GetAxis("Vertical"), 0, 1);
-        }
+            CheckForVehiculeExit();
+            float speed = rb.velocity.magnitude;
+            var velocity = rb.velocity;
+            var localVel = transform.InverseTransformDirection(velocity);
+            float motor = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
+            float steering = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
 
-       
-        foreach (AxleInfo axleInfo in axleInfos)
-        {
-            if (axleInfo.steering)
+            float brake = 0;
+            if (localVel.z > 0)
             {
-                axleInfo.leftWheel.steerAngle = steering * maxSteeringAngle;
-                axleInfo.rightWheel.steerAngle = steering * maxSteeringAngle; ;
+                brake = maxBraqueTorque * -1 * Mathf.Clamp(Input.GetAxis("Vertical"), -1, 0);
             }
-            if (axleInfo.motor)
+            else
             {
-                axleInfo.leftWheel.motorTorque = maxMotorTorque * motor;
-                axleInfo.rightWheel.motorTorque = maxMotorTorque * motor;
+                brake = maxBraqueTorque * Mathf.Clamp(Input.GetAxis("Vertical"), 0, 1);
             }
-            
 
-            ApplyLocalPositionToVisuals(axleInfo.leftWheel);
-            ApplyLocalPositionToVisuals(axleInfo.rightWheel);
+
+            foreach (AxleInfo axleInfo in axleInfos)
+            {
+                if (axleInfo.steering)
+                {
+                    axleInfo.leftWheel.steerAngle = steering * maxSteeringAngle;
+                    axleInfo.rightWheel.steerAngle = steering * maxSteeringAngle; ;
+                }
+                if (axleInfo.motor)
+                {
+                    axleInfo.leftWheel.motorTorque = maxMotorTorque * motor;
+                    axleInfo.rightWheel.motorTorque = maxMotorTorque * motor;
+                }
+
+
+                ApplyLocalPositionToVisuals(axleInfo.leftWheel);
+                ApplyLocalPositionToVisuals(axleInfo.rightWheel);
+            }
+
+            rb.drag = brake;
+
+            //Camera Rotation
+            cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
+            cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
+            cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
+            playerCameraParent.localRotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0);
         }
+    }
 
-        rb.drag = brake;
-
-        //Camera Rotation
-        cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
-        cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
-        cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
-        playerCameraParent.localRotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0);
+    void CheckForVehiculeExit()
+    {
+        if (Input.GetKeyDown("e"))
+        {
+            print("e");
+            CameraManager.instance.SwitchView();
+            PresentEntitiesManager.instance.PlayerEntityEnabled();
+        }
     }
 }

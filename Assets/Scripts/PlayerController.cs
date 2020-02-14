@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
     void CheckForVehiculeEntry()
     {
-        if (Input.GetKeyDown("e"))
+        if (Input.GetKeyDown("e") && !PresentEntitiesManager.instance.exitActionBlocked)
         {
             CameraManager.instance.SwitchView();
             PresentEntitiesManager.instance.VehiculeEntityEnabled();

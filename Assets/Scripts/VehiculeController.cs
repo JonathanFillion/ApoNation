@@ -107,15 +107,19 @@ public class VehiculeController : MonoBehaviour
             cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
             playerCameraParent.localRotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0);
         }
+        else
+        {
+            rb.drag = 10;
+        }
     }
 
     void CheckForVehiculeExit()
     {
-        if (Input.GetKeyDown("e"))
+        if (Input.GetKeyDown("e") && !PresentEntitiesManager.instance.exitActionBlocked)
         {
             print("e");
-            CameraManager.instance.SwitchView();
             PresentEntitiesManager.instance.PlayerEntityEnabled();
+            CameraManager.instance.SwitchView();
         }
     }
 }

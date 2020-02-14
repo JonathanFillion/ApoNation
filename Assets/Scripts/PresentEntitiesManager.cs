@@ -11,8 +11,12 @@ public class PresentEntitiesManager : MonoBehaviour
     public bool isPlayerControl = false;
     [HideInInspector]
     public bool isVehiculeControl = false;
+    public bool isTankControl = false;
+    public float exitActionBlockingTimer = 0.0f;
+    public bool exitActionBlocked = false;
     private GameObject Player;
     private GameObject Vehicule;
+    private GameObject Tank;
 
     private void Awake()
     {
@@ -30,19 +34,22 @@ public class PresentEntitiesManager : MonoBehaviour
     {
         Player = GameObject.FindWithTag("Player");
         Vehicule = GameObject.FindWithTag("Vehicule");
+        Tank = GameObject.FindWithTag("Tank");
         PlayerEntityEnabledAtStart();
     }
 
     public void SwitchControls()
     {
+
         if (isPlayerControl)
         {
-            VehiculeEntityEnabled();
+            TankEntityEnabled();
         }
         else
         {
             PlayerEntityEnabled();
         }
+        exitActionBlockingTimer = 1.0f;
     }
     public void PlayerEntityEnabledAtStart()
     {
@@ -56,8 +63,7 @@ public class PresentEntitiesManager : MonoBehaviour
         isPlayerControl = true;
         isVehiculeControl = false;
         Player.SetActive(true);
-        //Player.transform.position = Vehicule.transform.position;
-
+        Player.transform.position = (Vehicule.transform.position + new Vector3(2, 0, 0));
     }
 
     public void VehiculeEntityEnabled()
@@ -67,8 +73,20 @@ public class PresentEntitiesManager : MonoBehaviour
         Player.SetActive(false);
     }
 
+    public void TankEntityEnabled()
+    {
+        isPlayerControl = false;
+        isVehiculeControl = false;
+        isTankControl = true;
+        Player.SetActive(false);
+    }
+
     void Update()
     {
-
+        exitActionBlockingTimer -= Time.deltaTime;
+        if (exitActionBlockingTimer <= 0.0f && exitActionBlocked == true)
+        {
+            exitActionBlocked = false;
+        }
     }
 }

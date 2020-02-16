@@ -2,10 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
+public class TankAxleInfo
+{
+    public WheelCollider leftWheel;
+    public WheelCollider rightWheel;
+}
 
 public class TankController : MonoBehaviour
 {
-    public List<AxleInfo> axleInfos;
+    public List<TankAxleInfo> tankAxleInfo;
     public float maxMotorTorque;
     public float maxSteeringAngle;
     public float maxBraqueTorque;
@@ -13,7 +19,7 @@ public class TankController : MonoBehaviour
     public float lookXLimit = 60.0f;
     public Transform cameraParent;
 
-    private Vector2 cameraRotation = new Vector2(0, 0);
+    private Vector2 cameraRotation = new Vector2(0, -90);
     private Rigidbody rb;
     private bool highone = false;
     private bool lowone = false;
@@ -34,16 +40,17 @@ public class TankController : MonoBehaviour
     public void FixedUpdate()
     {
 
-        //if (PresentEntitiesManager.instance.isTankControl)
-       // {
-            //CheckForVehiculeExit();
-        /*    float speed = rb.velocity.magnitude;
+        if (PresentEntitiesManager.instance.isTankControl)
+        {
+            CheckForVehiculeExit();
+            float speed = rb.velocity.magnitude;
             var velocity = rb.velocity;
             var localVel = transform.InverseTransformDirection(velocity);
             float motor = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
             float steering = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
             float brake = 0;
 
+            //Determine frontal and backward brakes
             if (localVel.z > 0)
             {
                 brake = maxBraqueTorque * -1 * Mathf.Clamp(Input.GetAxis("Vertical"), -1, 0);
@@ -53,36 +60,31 @@ public class TankController : MonoBehaviour
                 brake = maxBraqueTorque * Mathf.Clamp(Input.GetAxis("Vertical"), 0, 1);
             }
 
-            foreach (AxleInfo axleInfo in axleInfos)
+
+
+            foreach (TankAxleInfo axleInfo in tankAxleInfo)
             {
-                if (axleInfo.steering)
+                axleInfo.leftWheel.motorTorque = maxMotorTorque * motor;
+                axleInfo.rightWheel.motorTorque = maxMotorTorque * motor;
+
+                //Maybe parent transform should be done here
+                if (steering < 0 || steering > 0)
                 {
-                    axleInfo.leftWheel.steerAngle = steering * maxSteeringAngle;
-                    axleInfo.rightWheel.steerAngle = steering * maxSteeringAngle; ;
-                }
-                if (axleInfo.motor)
-                {
-                    axleInfo.leftWheel.motorTorque = maxMotorTorque * motor;
-                    axleInfo.rightWheel.motorTorque = maxMotorTorque * motor;
+                    transform.Rotate(0, steering / 5, 0);
                 }
 
+            }
 
-                ApplyLocalPositionToVisuals(axleInfo.leftWheel);
-                ApplyLocalPositionToVisuals(axleInfo.rightWheel);
-            }*/
+            rb.drag = brake;
 
             //Camera Rotation
             cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
             cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
             cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
             cameraParent.localRotation = Quaternion.Euler(0, cameraRotation.y, cameraRotation.x);
-       // }
-       // else
-      //  {
-      //      rb.drag = 10;
-     //   }
-    }
 
+        }
+    }
     void CheckForVehiculeExit()
     {
         if (Input.GetKeyDown("e") && !PresentEntitiesManager.instance.exitActionBlocked)

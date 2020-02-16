@@ -71,13 +71,11 @@ public class TankController : MonoBehaviour
                 ApplyLocalPositionToVisuals(axleInfo.rightWheel);
             }*/
 
-            
-
             //Camera Rotation
             cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
             cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
             cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
-            cameraParent.localRotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0);
+            cameraParent.localRotation = Quaternion.Euler(0, cameraRotation.y, cameraRotation.x);
        // }
        // else
       //  {
@@ -91,7 +89,7 @@ public class TankController : MonoBehaviour
         {
             print("e");
             PresentEntitiesManager.instance.PlayerEntityEnabled();
-            CameraManager.instance.SwitchView();
+            CameraManager.instance.SwitchViewTankPlayer();
         }
     }
 }

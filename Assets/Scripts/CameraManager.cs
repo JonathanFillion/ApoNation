@@ -6,11 +6,13 @@ public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance = null;
 
-    Camera[] cameras;
-    private bool playerCam = false;
-    private bool vehiculeCam = false;
-    private bool tankCam = false;
-    
+    private bool playerCameraEnabled = false;
+    private bool vehiculeCameraEnabled = false;
+    private bool tankCameraEnabled = false;
+    private Camera playerCamera;
+    private Camera vehiculeCamera;
+    private Camera tankCamera;
+
     private void Awake()
     {
         if (instance == null)
@@ -25,35 +27,46 @@ public class CameraManager : MonoBehaviour
 
     void Start()
     {
-        cameras = Camera.allCameras;
-        print(cameras.Length);
+        playerCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
+        vehiculeCamera = GameObject.FindWithTag("VehiculeCamera").GetComponent<Camera>();
+        tankCamera = GameObject.FindWithTag("TankCamera").GetComponent<Camera>();
         PlayerView();
+    }
+
+    public void SwitchViewTankPlayer()
+    {
+        if (playerCamera.enabled == true)
+        {
+            TankView();
+        }
+        else
+        {
+            print("WHY");
+            PlayerView();
+        }
     }
 
     public void SwitchView()
     {
-        if (playerCam)
+        if (playerCameraEnabled == true)
         {
-            print("Enable vehicule cam");
-
             VehiculeView();
         }
         else
         {
-            print("Enable player cam");
-
             PlayerView();
         }
     }
 
     void TankView()
     {
+        print("CaLLED");
         EnableTankCamera();
         DisableVehiculeCamera();
         DisablePlayerCamera();
-        playerCam = false;
-        vehiculeCam = false;
-        tankCam = true;
+        playerCameraEnabled = false;
+        vehiculeCameraEnabled = false;
+        tankCameraEnabled = true;
     }
 
     void PlayerView()
@@ -61,9 +74,9 @@ public class CameraManager : MonoBehaviour
         EnablePlayerCamera();
         DisableVehiculeCamera();
         DisableTankCamera();
-        playerCam = true;
-        vehiculeCam = false;
-        tankCam = true;
+        playerCameraEnabled = true;
+        vehiculeCameraEnabled = false;
+        tankCameraEnabled = false;
     }
 
     void VehiculeView()
@@ -71,44 +84,45 @@ public class CameraManager : MonoBehaviour
         DisablePlayerCamera();
         EnableVehiculeCamera();
         DisableTankCamera();
-        playerCam = false;
-        vehiculeCam = true;
+        playerCameraEnabled = false;
+        vehiculeCameraEnabled = true;
+        tankCameraEnabled = false;
     }
 
     void EnablePlayerCamera()
     {
-        cameras[0].enabled = true;
-        cameras[0].GetComponent<AudioListener>().enabled = true;
+        playerCamera.enabled = true;
+        playerCamera.GetComponent<AudioListener>().enabled = true;
     }
 
     void DisablePlayerCamera()
     {
-        cameras[0].enabled = false;
-        cameras[0].GetComponent<AudioListener>().enabled = false;
+        playerCamera.enabled = false;
+        playerCamera.GetComponent<AudioListener>().enabled = false;
     }
 
     void EnableVehiculeCamera()
     {
-        cameras[1].enabled = true;
-        cameras[1].GetComponent<AudioListener>().enabled = true;
+        vehiculeCamera.enabled = true;
+        vehiculeCamera.GetComponent<AudioListener>().enabled = true;
     }
 
     void DisableVehiculeCamera()
     {
-        cameras[1].enabled = false;
-        cameras[1].GetComponent<AudioListener>().enabled = false;
+        vehiculeCamera.enabled = false;
+        vehiculeCamera.GetComponent<AudioListener>().enabled = false;
     }
 
     void EnableTankCamera()
     {
-        cameras[2].enabled = true;
-        cameras[2].GetComponent<AudioListener>().enabled = true;
+        tankCamera.enabled = true;
+        tankCamera.GetComponent<AudioListener>().enabled = true;
     }
     
     void DisableTankCamera()
     {
-        cameras[2].enabled = false;
-        cameras[2].GetComponent<AudioListener>().enabled = false;
+        tankCamera.enabled = false;
+        tankCamera.GetComponent<AudioListener>().enabled = false;
     }
     
     void Update()

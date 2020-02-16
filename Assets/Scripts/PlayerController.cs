@@ -69,8 +69,8 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown("e") && !PresentEntitiesManager.instance.exitActionBlocked)
         {
-            CameraManager.instance.SwitchView();
-            PresentEntitiesManager.instance.VehiculeEntityEnabled();
+            PresentEntitiesManager.instance.TankEntityEnabled();
+            CameraManager.instance.SwitchViewTankPlayer();
         }
     }
 }

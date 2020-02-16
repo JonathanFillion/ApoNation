@@ -36,12 +36,13 @@ public class PresentEntitiesManager : MonoBehaviour
         Vehicule = GameObject.FindWithTag("Vehicule");
         Tank = GameObject.FindWithTag("Tank");
         PlayerEntityEnabledAtStart();
+        print("START IN ENTITY WORKS");
     }
 
     public void SwitchControls()
     {
 
-        if (isPlayerControl)
+        if (isPlayerControl == true)
         {
             TankEntityEnabled();
         }
@@ -49,36 +50,51 @@ public class PresentEntitiesManager : MonoBehaviour
         {
             PlayerEntityEnabled();
         }
-        exitActionBlockingTimer = 1.0f;
+        
     }
     public void PlayerEntityEnabledAtStart()
     {
         isPlayerControl = true;
         isVehiculeControl = false;
+        isTankControl = false;
         Player.SetActive(true);
+        StartTimer();
     }
 
     public void PlayerEntityEnabled()
     {
+        print("Should see to player");
         isPlayerControl = true;
         isVehiculeControl = false;
+        isTankControl = false;
         Player.SetActive(true);
-        Player.transform.position = (Vehicule.transform.position + new Vector3(2, 0, 0));
+        StartTimer();
+        //Player.transform.position = (Vehicule.transform.position + new Vector3(2, 0, 0));
     }
 
     public void VehiculeEntityEnabled()
     {
         isPlayerControl = false;
         isVehiculeControl = true;
+        isTankControl = false;
         Player.SetActive(false);
+        StartTimer();
     }
 
     public void TankEntityEnabled()
     {
+        print("Should see to tank");
         isPlayerControl = false;
         isVehiculeControl = false;
         isTankControl = true;
         Player.SetActive(false);
+        StartTimer();
+    }
+
+    private void StartTimer()
+    {
+        exitActionBlockingTimer = 1.0f;
+        exitActionBlocked = true;
     }
 
     void Update()
@@ -86,6 +102,7 @@ public class PresentEntitiesManager : MonoBehaviour
         exitActionBlockingTimer -= Time.deltaTime;
         if (exitActionBlockingTimer <= 0.0f && exitActionBlocked == true)
         {
+            print("Timer finished");
             exitActionBlocked = false;
         }
     }

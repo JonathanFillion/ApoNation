@@ -52,17 +52,12 @@ public class VehiculeController : MonoBehaviour
 
     public void Update()
     {
-        if (PresentEntitiesManager.instance.isVehiculeControl)
-        {
             CheckForVehiculeExit();
-        }
     }
 
     public void FixedUpdate()
     {
 
-        if (PresentEntitiesManager.instance.isVehiculeControl)
-        {
             CheckForVehiculeExit();
             float speed = rb.velocity.magnitude;
             var velocity = rb.velocity;
@@ -106,20 +101,12 @@ public class VehiculeController : MonoBehaviour
             cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
             cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
             playerCameraParent.localRotation = Quaternion.Euler(cameraRotation.x, cameraRotation.y, 0);
-        }
-        else
-        {
-            rb.drag = 10;
-        }
     }
 
     void CheckForVehiculeExit()
     {
         if (Input.GetKeyDown("e") && !PresentEntitiesManager.instance.exitActionBlocked)
         {
-            print("e");
-            PresentEntitiesManager.instance.PlayerEntityEnabled();
-            CameraManager.instance.SwitchView();
         }
     }
 }

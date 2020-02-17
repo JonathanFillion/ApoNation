@@ -8,6 +8,7 @@ TagManager:
   - Tank
   - TankCamera
   - VehiculeCamera
+  - Terrain
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
+  - Terrain
   - 
   - 
   - 

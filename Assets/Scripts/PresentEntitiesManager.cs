@@ -10,12 +10,10 @@ public class PresentEntitiesManager : MonoBehaviour
     [HideInInspector]
     public bool isPlayerControl = false;
     [HideInInspector]
-    public bool isVehiculeControl = false;
     public bool isTankControl = false;
     public float exitActionBlockingTimer = 0.0f;
     public bool exitActionBlocked = false;
     private GameObject Player;
-    private GameObject Vehicule;
     private GameObject Tank;
 
     private void Awake()
@@ -33,10 +31,8 @@ public class PresentEntitiesManager : MonoBehaviour
     void Start()
     {
         Player = GameObject.FindWithTag("Player");
-        Vehicule = GameObject.FindWithTag("Vehicule");
         Tank = GameObject.FindWithTag("Tank");
-        PlayerEntityEnabledAtStart();
-        print("START IN ENTITY WORKS");
+        TankEntityEnabled();
     }
 
     public void SwitchControls()
@@ -50,12 +46,11 @@ public class PresentEntitiesManager : MonoBehaviour
         {
             PlayerEntityEnabled();
         }
-        
+
     }
     public void PlayerEntityEnabledAtStart()
     {
         isPlayerControl = true;
-        isVehiculeControl = false;
         isTankControl = false;
         Player.SetActive(true);
         StartTimer();
@@ -65,31 +60,21 @@ public class PresentEntitiesManager : MonoBehaviour
     {
         print("Should see to player");
         isPlayerControl = true;
-        isVehiculeControl = false;
         isTankControl = false;
         Player.SetActive(true);
         StartTimer();
         //Player.transform.position = (Vehicule.transform.position + new Vector3(2, 0, 0));
     }
 
-    public void VehiculeEntityEnabled()
-    {
-        isPlayerControl = false;
-        isVehiculeControl = true;
-        isTankControl = false;
-        Player.SetActive(false);
-        StartTimer();
-    }
-
     public void TankEntityEnabled()
     {
-        print("Should see to tank");
         isPlayerControl = false;
-        isVehiculeControl = false;
         isTankControl = true;
         Player.SetActive(false);
         StartTimer();
     }
+
+
 
     private void StartTimer()
     {

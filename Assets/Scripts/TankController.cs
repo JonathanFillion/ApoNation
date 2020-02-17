@@ -2,96 +2,108 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class TankAxleInfo
-{
-    public WheelCollider leftWheel;
-    public WheelCollider rightWheel;
-}
 
 public class TankController : MonoBehaviour
 {
-    public List<TankAxleInfo> tankAxleInfo;
-    public float maxMotorTorque;
-    public float maxSteeringAngle;
-    public float maxBraqueTorque;
+    public float accelaration = 10.0f;
+    public float maximumSpeed = 10.0f;
+    public float maximumTurningSpeed = 1.0f;
+    public float angularAcceleration = 10.0f;
     public float lookSpeed = 2.0f;
     public float lookXLimit = 60.0f;
+    public float turnDragging = 10.0f;
     public Transform cameraParent;
+    public float DistanceToTheGround;
 
     private Vector2 cameraRotation = new Vector2(0, -90);
     private Rigidbody rb;
-    private bool highone = false;
-    private bool lowone = false;
+
+    //Reusability
+    private bool isGrounded;
+    private RaycastHit hit;
+
 
     public void Start()
     {
+        DistanceToTheGround = GetComponent<Collider>().bounds.extents.y;
         rb = GetComponent<Rigidbody>();
     }
 
     public void Update()
     {
-        if (PresentEntitiesManager.instance.isTankControl)
-        {
-            CheckForVehiculeExit();
-        }
+
     }
 
     public void FixedUpdate()
     {
 
-        if (PresentEntitiesManager.instance.isTankControl)
+        float speed = rb.velocity.magnitude;
+        var velocity = rb.velocity;
+        var localVel = transform.InverseTransformDirection(velocity);
+        var velocityAngle = Vector3.Angle(rb.velocity, transform.TransformDirection(Vector3.forward)) - 90;
+        bool notorque = true;
+        float traction = 1 / speed;
+        float vin = Input.GetAxis("Vertical");
+        float hin = Input.GetAxis("Horizontal");
+        //isGrounded = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, DistanceToTheGround + 0.1f);
+        //print(DistanceToTheGround);
+        //print(isGrounded);
+
+        if (vin != 0 && isGrounded == true)
         {
-            CheckForVehiculeExit();
-            float speed = rb.velocity.magnitude;
-            var velocity = rb.velocity;
-            var localVel = transform.InverseTransformDirection(velocity);
-            float motor = Mathf.Clamp(Input.GetAxis("Vertical"), -1, 1);
-            float steering = Mathf.Clamp(Input.GetAxis("Horizontal"), -1, 1);
-            float brake = 0;
-
-            //Determine frontal and backward brakes
-            if (localVel.z > 0)
+            notorque = false;
+            if (localVel.z > -maximumSpeed && localVel.z < maximumSpeed)
             {
-                brake = maxBraqueTorque * -1 * Mathf.Clamp(Input.GetAxis("Vertical"), -1, 0);
+                rb.AddForce(transform.TransformDirection(Vector3.forward) * vin * accelaration * rb.mass);
             }
-            else
-            {
-                brake = maxBraqueTorque * Mathf.Clamp(Input.GetAxis("Vertical"), 0, 1);
-            }
-
-
-
-            foreach (TankAxleInfo axleInfo in tankAxleInfo)
-            {
-                axleInfo.leftWheel.motorTorque = maxMotorTorque * motor;
-                axleInfo.rightWheel.motorTorque = maxMotorTorque * motor;
-
-                //Maybe parent transform should be done here
-                if (steering < 0 || steering > 0)
-                {
-                    transform.Rotate(0, steering / 5, 0);
-                }
-
-            }
-
-            rb.drag = brake;
-
-            //Camera Rotation
-            cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
-            cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
-            cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
-            cameraParent.localRotation = Quaternion.Euler(0, cameraRotation.y, cameraRotation.x);
-
         }
+
+
+
+
+        if (hin != 0 && isGrounded == true)
+        {
+            notorque = false;
+            if (rb.angularVelocity.magnitude < maximumTurningSpeed)
+            {
+                rb.AddTorque(Vector3.up * hin * angularAcceleration * rb.mass);
+            }
+        }
+        else
+        {
+            rb.AddTorque(-rb.angularVelocity * turnDragging * rb.mass);
+        }
+
+        if (velocityAngle > 0 && notorque == false && isGrounded == true)
+        {
+            rb.velocity = Vector3.Slerp(rb.velocity, -transform.forward * rb.velocity.magnitude, traction);
+        }
+        else if (velocityAngle < 0 && notorque == false && isGrounded == true)
+        {
+            rb.velocity = Vector3.Slerp(rb.velocity, transform.forward * rb.velocity.magnitude, traction);
+        }
+        //Camera Rotation
+        /*cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
+        cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
+        cameraRotation.x = Mathf.Clamp(cameraRotation.x, -lookXLimit, lookXLimit);
+        cameraParent.localRotation = Quaternion.Euler(0, cameraRotation.y, cameraRotation.x);*/
+
     }
+
+    void OnCollisionEnter(Collision collision) {
+        isGrounded = true;
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        isGrounded = false;
+    }
+
+
     void CheckForVehiculeExit()
     {
         if (Input.GetKeyDown("e") && !PresentEntitiesManager.instance.exitActionBlocked)
         {
-            print("e");
-            PresentEntitiesManager.instance.PlayerEntityEnabled();
-            CameraManager.instance.SwitchViewTankPlayer();
         }
     }
 }

@@ -79,6 +79,38 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &252983772847292192
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3045009759337838524}
+  m_Layer: 0
+  m_Name: Tank Head Container
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3045009759337838524
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252983772847292192}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 8825094450534839338}
+  - {fileID: 3174145386477467424}
+  m_Father: {fileID: 6718113484896142196}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &668024626190390874
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,11 +136,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 668024626190390874}
-  m_LocalRotation: {x: -0.0000000619687, y: -0.7071067, z: -0.000000061968684, w: 0.7071068}
-  m_LocalPosition: {x: 0.031005383, y: 0.00022618227, z: -0.0013454878}
-  m_LocalScale: {x: -0.22325963, y: -0.059065502, z: -0.20222376}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.26301575, y: 3.3566952, z: 4.000183}
+  m_LocalScale: {x: 17.145447, y: 16.44744, z: 25.894419}
   m_Children: []
-  m_Father: {fileID: 8825094450534839338}
+  m_Father: {fileID: 3174145386477467424}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3865648364129264616
@@ -658,7 +690,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747744445306089549}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -17.73, y: 3.01, z: 0}
+  m_LocalPosition: {x: -17.73, y: 5.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1747744446163047241}
@@ -744,7 +776,7 @@ Transform:
   m_Children:
   - {fileID: 1747744445306089548}
   m_Father: {fileID: 6718113484896142196}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1747744446470173317
 GameObject:
@@ -1119,12 +1151,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5360730854398112902}
   m_LocalRotation: {x: -0.50008714, y: -0.49991292, z: 0.5000874, w: -0.49991262}
-  m_LocalPosition: {x: -0.2, y: 3.46, z: 0.03}
+  m_LocalPosition: {x: -0.19999695, y: 3.460001, z: 0.02999878}
   m_LocalScale: {x: -128.04834, y: -278.46097, z: -76.796}
-  m_Children:
-  - {fileID: 6331066445751984950}
-  m_Father: {fileID: 6718113484896142196}
-  m_RootOrder: 1
+  m_Children: []
+  m_Father: {fileID: 3045009759337838524}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 89.98, y: -90, z: 179.99998}
 --- !u!33 &5552586582192569939
 MeshFilter:
@@ -1615,8 +1646,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7241804243777270862}
-  - {fileID: 8825094450534839338}
   - {fileID: 1747744446163047241}
+  - {fileID: 3045009759337838524}
   m_Father: {fileID: 1747744446470173316}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1661,21 +1692,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8c0d8b90ab0ce04889387d5222bca99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tankAxleInfo:
-  - leftWheel: {fileID: 0}
-    rightWheel: {fileID: 0}
-  - leftWheel: {fileID: 0}
-    rightWheel: {fileID: 0}
-  - leftWheel: {fileID: 0}
-    rightWheel: {fileID: 0}
-  - leftWheel: {fileID: 0}
-    rightWheel: {fileID: 0}
-  maxMotorTorque: 1e+19
-  maxSteeringAngle: 0
-  maxBraqueTorque: 0
+  accelarationFactor: 100
+  maximumSpeed: 10
+  maximumTurningSpeed: 100
+  rotationSpeed: 240
+  frictionBasicFactor: 4
   lookSpeed: 2
   lookXLimit: 60
+  turnDragging: 10
   cameraParent: {fileID: 1747744446163047241}
+  DistanceToTheGround: 0
+--- !u!1 &8349125027740222894
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3174145386477467424}
+  m_Layer: 0
+  m_Name: Tank Canon Container
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3174145386477467424
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8349125027740222894}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 6331066445751984950}
+  m_Father: {fileID: 3045009759337838524}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8478289592818408086
 GameObject:
   m_ObjectHideFlags: 0

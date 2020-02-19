@@ -13,7 +13,7 @@ public class TankController : MonoBehaviour
     public float lookSpeed = 2.0f;
     public float turnDragging = 10.0f;
     public Transform cameraParent;
-    public float DistanceToTheGround;
+    public float tankRecoilForce = 1000000;
 
     private Vector2 cameraRotation = new Vector2(0, -90);
     private float lookXLimitMax = 15.0f;
@@ -22,15 +22,17 @@ public class TankController : MonoBehaviour
     private Transform turret;
     private Transform canon;
     private Camera camera;
+    private bool enableFreeLook = false;
 
-    //Reusability
+    private bool canonInRecoil = false;
+    private float timeForcanonInRecoilRecovery = 0.0f;
+    private float recoilRatio = 0.0f;
     private bool isGrounded;
     private RaycastHit hit;
 
 
     public void Start()
     {
-        DistanceToTheGround = GetComponent<Collider>().bounds.extents.y;
         rb = GetComponent<Rigidbody>();
         turret = transform.Find("Tank Head Container");
         canon = turret.Find("Tank Canon Container");
@@ -41,7 +43,15 @@ public class TankController : MonoBehaviour
 
     public void Update()
     {
+        if (Input.GetKeyDown("space"))
+        {
+            enableFreeLook = !enableFreeLook;
+        }
 
+        if (Input.GetMouseButtonDown(0) && canonInRecoil == false)
+        {
+            FireMainCanon();
+        }
 
 
         /*Camera Rotation*/
@@ -69,33 +79,39 @@ public class TankController : MonoBehaviour
 
         /*Canon Rotation*/
         RaycastHit hit;
-        float aimingDistance = 100.0f;
+        float aimingDistance = 500.0f;
         Vector3 aimPoint = new Vector3();
-        Vector3 canonAimPoint = new Vector3();
         Ray ray = camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit))
         {
             aimPoint = hit.point;
-            Debug.DrawLine(ray.origin, hit.point, Color.red);
+            //Debug.DrawLine(ray.origin, hit.point, Color.red);
         }
         else
         {
             aimPoint = ray.origin + ray.direction * aimingDistance;
-            Debug.DrawLine(ray.origin, aimPoint, Color.red);
+            //Debug.DrawLine(ray.origin, aimPoint, Color.red);
         }
-        canonAimPoint = aimPoint;
-        aimPoint.y = transform.position.y;
-        turret.LookAt(aimPoint);
 
-        print(camera.transform.position.y);
-        //4.05 a 8.51
+        /*Turret rotation*/
+        var tempAimPoint = aimPoint;
+        tempAimPoint.y = transform.position.y;
+        if (enableFreeLook == false)
+        {
+            turret.LookAt(tempAimPoint);
+        }
 
-    }
+        /*Calculate inclination angle for canon*/
+        float inclinationRatio = (cameraRotation.x - 1) / 14;
+        float canonAngle = 7.5f;
+        float calcAngle = inclinationRatio * canonAngle;
+        float realAngle = calcAngle;
 
-
-    void OnGUI()
-    {
-
+        /*Apply canon barrel inclination*/
+        if (enableFreeLook == false)
+        {
+            canon.rotation = Quaternion.Euler(-realAngle, turret.eulerAngles.y, turret.eulerAngles.z);
+        }
     }
 
     public void FixedUpdate()
@@ -109,9 +125,7 @@ public class TankController : MonoBehaviour
         float traction = 1 / speed;
         float vin = Input.GetAxis("Vertical");
         float hin = Input.GetAxis("Horizontal");
-        //isGrounded = Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out hit, DistanceToTheGround + 0.1f);
-        //print(DistanceToTheGround);
-        //print(isGrounded);
+
 
         /*Vertical*/
         if (vin != 0 && isGrounded == true)
@@ -164,10 +178,46 @@ public class TankController : MonoBehaviour
         {
             rb.velocity = Vector3.Slerp(rb.velocity, transform.forward * rb.velocity.magnitude, traction);
         }
+        PerformRecoilRecoveryAnimation();
+    }
+
+    void PerformRecoilRecoveryAnimation()
+    {
+        if (canonInRecoil == true)
+        {
+            timeForcanonInRecoilRecovery -= Time.deltaTime;
+            if (timeForcanonInRecoilRecovery <= 0.0f && canonInRecoil == true)
+            {
+                canonInRecoil = false;
+                return;
+            }
+            float recovery = 1 - (timeForcanonInRecoilRecovery / recoilRatio);
+            float rem = recovery * recoilRatio;
+            recoilRatio = recoilRatio - rem;
+            print(recoilRatio);
+            canon.localPosition = canon.localPosition + new Vector3(0, 0, rem);
+        }
+    }
 
 
+    void FireMainCanon()
+    {
+        PerformCanonInRecoil();
+        PerformTankBodyRecoil();
 
+    }
 
+    void PerformTankBodyRecoil()
+    {
+        rb.AddForce(turret.TransformDirection(Vector3.back) * tankRecoilForce);
+    }
+
+    void PerformCanonInRecoil()
+    {
+        recoilRatio = 2.0f;
+        canon.localPosition = canon.localPosition + new Vector3(0, 0, -recoilRatio);
+        canonInRecoil = true;
+        timeForcanonInRecoilRecovery = 1.0f;
 
     }
 

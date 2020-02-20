@@ -9,6 +9,8 @@ TagManager:
   - TankCamera
   - VehiculeCamera
   - Terrain
+  - TankHeadContainer
+  - TankCanonContainer
   layers:
   - Default
   - TransparentFX

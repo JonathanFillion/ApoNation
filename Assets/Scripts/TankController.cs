@@ -12,15 +12,17 @@ public class TankController : MonoBehaviour
     public float frictionBasicFactor = 4.0f;
     public float lookSpeed = 2.0f;
     public float turnDragging = 10.0f;
-    public Transform cameraParent;
     public float tankRecoilForce = 1000000;
 
+    public Transform cameraParent;
+    public GameObject bulletReference;
+
     private Vector2 cameraRotation = new Vector2(0, -90);
-    private float lookXLimitMax = 15.0f;
+    private float lookXLimitMax = 13.0f;
     private float lookXLimitMin = 1.0f;
     private Rigidbody rb;
-    private Transform turret;
-    private Transform canon;
+    private GameObject turret;
+    private GameObject canon;
     private Camera camera;
     private bool enableFreeLook = false;
 
@@ -34,8 +36,9 @@ public class TankController : MonoBehaviour
     public void Start()
     {
         rb = GetComponent<Rigidbody>();
-        turret = transform.Find("Tank Head Container");
-        canon = turret.Find("Tank Canon Container");
+        print(rb);
+        turret = GameObject.FindWithTag("TankHeadContainer");
+        canon = GameObject.FindWithTag("TankCanonContainer");
         Cursor.lockState = CursorLockMode.Locked;
         camera = GameObject.FindWithTag("TankCamera").GetComponent<Camera>();
 
@@ -98,7 +101,7 @@ public class TankController : MonoBehaviour
         tempAimPoint.y = transform.position.y;
         if (enableFreeLook == false)
         {
-            turret.LookAt(tempAimPoint);
+            turret.transform.LookAt(tempAimPoint);
         }
 
         /*Calculate inclination angle for canon*/
@@ -106,12 +109,10 @@ public class TankController : MonoBehaviour
         float canonAngle = 7.5f;
         float calcAngle = inclinationRatio * canonAngle;
         float realAngle = calcAngle;
-
+        print(cameraRotation.x);
+        print(realAngle);
         /*Apply canon barrel inclination*/
-        if (enableFreeLook == false)
-        {
-            canon.rotation = Quaternion.Euler(-realAngle, turret.eulerAngles.y, turret.eulerAngles.z);
-        }
+        canon.transform.rotation = Quaternion.Euler(-realAngle, turret.transform.eulerAngles.y, turret.transform.eulerAngles.z);
     }
 
     public void FixedUpdate()
@@ -125,7 +126,6 @@ public class TankController : MonoBehaviour
         float traction = 1 / speed;
         float vin = Input.GetAxis("Vertical");
         float hin = Input.GetAxis("Horizontal");
-
 
         /*Vertical*/
         if (vin != 0 && isGrounded == true)
@@ -195,7 +195,7 @@ public class TankController : MonoBehaviour
             float rem = recovery * recoilRatio;
             recoilRatio = recoilRatio - rem;
             print(recoilRatio);
-            canon.localPosition = canon.localPosition + new Vector3(0, 0, rem);
+            canon.transform.localPosition = canon.transform.localPosition + new Vector3(0, 0, rem);
         }
     }
 
@@ -204,18 +204,24 @@ public class TankController : MonoBehaviour
     {
         PerformCanonInRecoil();
         PerformTankBodyRecoil();
+        PerformBullet();
+    }
 
+    void PerformBullet()
+    {
+        Instantiate(bulletReference, canon.transform.position, Quaternion.identity);
     }
 
     void PerformTankBodyRecoil()
     {
-        rb.AddForce(turret.TransformDirection(Vector3.back) * tankRecoilForce);
+        rb.AddForce(turret.transform.TransformDirection(Vector3.back) * tankRecoilForce);
+        //rb.AddTorque(turret.TransformDirection(Vector3.back) * tankRecoilForce);
     }
 
     void PerformCanonInRecoil()
     {
         recoilRatio = 2.0f;
-        canon.localPosition = canon.localPosition + new Vector3(0, 0, -recoilRatio);
+        canon.transform.localPosition = canon.transform.localPosition + new Vector3(0, 0, -recoilRatio);
         canonInRecoil = true;
         timeForcanonInRecoilRecovery = 1.0f;
 

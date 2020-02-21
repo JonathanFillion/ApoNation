@@ -13,6 +13,9 @@ public class TankController : MonoBehaviour
     public float lookSpeed = 2.0f;
     public float turnDragging = 10.0f;
     public float tankRecoilForce = 1000000;
+    public float bulletProjectileSpeed = 150000;
+
+
 
     public Transform cameraParent;
     public GameObject bulletReference;
@@ -23,11 +26,12 @@ public class TankController : MonoBehaviour
     private Rigidbody rb;
     private GameObject turret;
     private GameObject canon;
+    private GameObject canonTip;
     private Camera camera;
     private bool enableFreeLook = false;
 
     private bool canonInRecoil = false;
-    private float timeForcanonInRecoilRecovery = 0.0f;
+    private float timeForCanonInRecoilRecovery = 0.0f;
     private float recoilRatio = 0.0f;
     private bool isGrounded;
     private RaycastHit hit;
@@ -36,11 +40,12 @@ public class TankController : MonoBehaviour
     public void Start()
     {
         rb = GetComponent<Rigidbody>();
-        print(rb);
         turret = GameObject.FindWithTag("TankHeadContainer");
         canon = GameObject.FindWithTag("TankCanonContainer");
+        canonTip = GameObject.FindWithTag("CanonTip");
         Cursor.lockState = CursorLockMode.Locked;
         camera = GameObject.FindWithTag("TankCamera").GetComponent<Camera>();
+
 
     }
 
@@ -56,6 +61,8 @@ public class TankController : MonoBehaviour
             FireMainCanon();
         }
 
+
+        ZoomCamera();
 
         /*Camera Rotation*/
         cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
@@ -109,8 +116,6 @@ public class TankController : MonoBehaviour
         float canonAngle = 7.5f;
         float calcAngle = inclinationRatio * canonAngle;
         float realAngle = calcAngle;
-        print(cameraRotation.x);
-        print(realAngle);
         /*Apply canon barrel inclination*/
         canon.transform.rotation = Quaternion.Euler(-realAngle, turret.transform.eulerAngles.y, turret.transform.eulerAngles.z);
     }
@@ -126,6 +131,7 @@ public class TankController : MonoBehaviour
         float traction = 1 / speed;
         float vin = Input.GetAxis("Vertical");
         float hin = Input.GetAxis("Horizontal");
+
 
         /*Vertical*/
         if (vin != 0 && isGrounded == true)
@@ -181,20 +187,30 @@ public class TankController : MonoBehaviour
         PerformRecoilRecoveryAnimation();
     }
 
+    void ZoomCamera()
+    {
+        var minFov = 1;
+        var maxFov = 100;
+        float fov = camera.fieldOfView;
+        fov += Input.GetAxis("Mouse ScrollWheel") * -10;
+        fov = Mathf.Clamp(fov, minFov, maxFov);
+        print(fov);
+        camera.fieldOfView = fov;
+    }
+
     void PerformRecoilRecoveryAnimation()
     {
         if (canonInRecoil == true)
         {
-            timeForcanonInRecoilRecovery -= Time.deltaTime;
-            if (timeForcanonInRecoilRecovery <= 0.0f && canonInRecoil == true)
+            timeForCanonInRecoilRecovery -= Time.deltaTime;
+            if (timeForCanonInRecoilRecovery <= 0.0f && canonInRecoil == true)
             {
                 canonInRecoil = false;
                 return;
             }
-            float recovery = 1 - (timeForcanonInRecoilRecovery / recoilRatio);
+            float recovery = 1 - (timeForCanonInRecoilRecovery / recoilRatio);
             float rem = recovery * recoilRatio;
             recoilRatio = recoilRatio - rem;
-            print(recoilRatio);
             canon.transform.localPosition = canon.transform.localPosition + new Vector3(0, 0, rem);
         }
     }
@@ -209,7 +225,11 @@ public class TankController : MonoBehaviour
 
     void PerformBullet()
     {
-        Instantiate(bulletReference, canon.transform.position, Quaternion.identity);
+        var bullet = Instantiate(bulletReference);
+        bullet.transform.position = canonTip.transform.position;
+        bullet.transform.rotation = canon.transform.rotation;
+        var rbBullet = bullet.GetComponent<Rigidbody>();
+        rbBullet.AddForce(canon.transform.TransformDirection(Vector3.forward) * rbBullet.mass * bulletProjectileSpeed);
     }
 
     void PerformTankBodyRecoil()
@@ -223,18 +243,25 @@ public class TankController : MonoBehaviour
         recoilRatio = 2.0f;
         canon.transform.localPosition = canon.transform.localPosition + new Vector3(0, 0, -recoilRatio);
         canonInRecoil = true;
-        timeForcanonInRecoilRecovery = 1.0f;
+        timeForCanonInRecoilRecovery = 1.5f;
 
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        isGrounded = true;
+        if (collision.gameObject.tag == "Terrain")
+        {
+            isGrounded = true;
+        }
+
     }
 
     void OnCollisionExit(Collision collision)
     {
-        isGrounded = false;
+        if (collision.gameObject.tag == "Terrain")
+        {
+            isGrounded = false;
+        }
     }
 
 }

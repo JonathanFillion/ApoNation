@@ -12,6 +12,7 @@ TagManager:
   - TankHeadContainer
   - TankCanonContainer
   - CanonTip
+  - BulletTank
   layers:
   - Default
   - TransparentFX

@@ -13,7 +13,7 @@ public class TankController : MonoBehaviour
     public float lookSpeed = 2.0f;
     public float turnDragging = 10.0f;
     public float tankRecoilForce = 1000000;
-    public float bulletProjectileSpeed = 150000;
+    public float bulletProjectileSpeed = 100; //000;
 
 
 
@@ -63,7 +63,7 @@ public class TankController : MonoBehaviour
 
 
         ZoomCamera();
-
+        AdjustCameraClipping();
         /*Camera Rotation*/
         cameraRotation.y += Input.GetAxis("Mouse X") * lookSpeed;
         cameraRotation.x += -Input.GetAxis("Mouse Y") * lookSpeed;
@@ -120,6 +120,7 @@ public class TankController : MonoBehaviour
         canon.transform.rotation = Quaternion.Euler(-realAngle, turret.transform.eulerAngles.y, turret.transform.eulerAngles.z);
     }
 
+
     public void FixedUpdate()
     {
 
@@ -146,10 +147,22 @@ public class TankController : MonoBehaviour
         /*Rotation*/
         if (hin != 0 && isGrounded == true)
         {
-            notorque = false;
-            if (rb.angularVelocity.magnitude < maximumTurningSpeed)
+            if (vin >= 0)
             {
-                rb.AddTorque(Vector3.up * hin * rotationSpeed * rb.mass);
+                notorque = false;
+                if (rb.angularVelocity.magnitude < maximumTurningSpeed)
+                {
+                    rb.AddTorque(Vector3.up * hin * rotationSpeed * rb.mass);
+                }
+            }
+            else if (vin < 0)
+            {
+                notorque = false;
+                if (rb.angularVelocity.magnitude < maximumTurningSpeed)
+                {
+                    rb.AddTorque(Vector3.up * -hin * rotationSpeed * rb.mass);
+                }
+
             }
         }
         else
@@ -187,6 +200,22 @@ public class TankController : MonoBehaviour
         PerformRecoilRecoveryAnimation();
     }
 
+    void AdjustCameraClipping()
+    {
+
+        float distance = Vector3.Distance(transform.position, camera.transform.position);
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, camera.transform.position, out hit, distance + 0.5f))
+        {
+            if (hit.collider.tag != "Tank")
+            {
+
+            }
+        }
+    }
+
+
+
     void ZoomCamera()
     {
         var minFov = 1;
@@ -194,7 +223,6 @@ public class TankController : MonoBehaviour
         float fov = camera.fieldOfView;
         fov += Input.GetAxis("Mouse ScrollWheel") * -10;
         fov = Mathf.Clamp(fov, minFov, maxFov);
-        print(fov);
         camera.fieldOfView = fov;
     }
 
@@ -215,7 +243,6 @@ public class TankController : MonoBehaviour
         }
     }
 
-
     void FireMainCanon()
     {
         PerformCanonInRecoil();
@@ -235,7 +262,6 @@ public class TankController : MonoBehaviour
     void PerformTankBodyRecoil()
     {
         rb.AddForce(turret.transform.TransformDirection(Vector3.back) * tankRecoilForce);
-        //rb.AddTorque(turret.TransformDirection(Vector3.back) * tankRecoilForce);
     }
 
     void PerformCanonInRecoil()

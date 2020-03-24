@@ -13,6 +13,8 @@ TagManager:
   - TankCanonContainer
   - CanonTip
   - BulletTank
+  - CanonSmoke
+  - ImpactParticule
   layers:
   - Default
   - TransparentFX
